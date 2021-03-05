@@ -1,0 +1,436 @@
+<!--Saved by Quest 5.8.6836.13983-->
+<asl version="580">
+  <include ref="English.aslx" />
+  <include ref="Core.aslx" />
+  <template name="DefaultHelp"><![CDATA[<u>Examples of commands</u><br/><br/>
+<b>- Objects:</b>  LOOK AT... SPEAK TO... ASK [object] ABOUT... TELL [object] ABOUT... ATTACK... EAT... HUG... <br/>
+<b>- Inventory:</b>  See which items you are carrying by typing I, INV or INVENTORY.<br/>
+<b>- Moving around:</b>  Press the compass buttons, or type GO NORTH, SOUTH, E, GO TO...<br/>
+<b>- Shortcuts:</b>  Press the up arrow and down arrow to scroll through commands you have already typed in. Try X... as a shortcut for LOOK AT...</br> (Try experimenting and find other actions!)                ]]></template>
+  <dynamictemplate name="DefaultKill">"God refuses to let the "+object.name+" die yet. You will have to atone for your sins later."</dynamictemplate>
+  <game name="The Important Expedition of Hernán Cortés">
+    <inherit name="theme_typewriter" />
+    <gameid>c9ddf2b1-a7dc-41d5-984e-038c973186a8</gameid>
+    <version>1.0</version>
+    <firstpublished>2019</firstpublished>
+    <author>N.H.</author>
+    <description><![CDATA[You play as Hernán Cortés de Monroy y Pizarro Altamirano, a Spanish conquistador exploring Mexico.<br/>]]></description>
+    <showscore />
+    <feature_limitinventory />
+    <feature_lightdark />
+    <feature_asktell />
+    <feature_annotations />
+    <feature_advancedscripts />
+    <appendobjectdescription />
+    <allowlookdirections type="boolean">false</allowlookdirections>
+    <multiplecommands type="boolean">false</multiplecommands>
+    <subtitle>From the Second Letter to Charles V</subtitle>
+    <gridmap type="boolean">false</gridmap>
+    <showpanes />
+    <category>Educational</category>
+    <customwidth type="int">1000</customwidth>
+    <defaultfontsize type="int">11</defaultfontsize>
+    <mapsize type="int">200</mapsize>
+    <attr name="feature_pictureframe" type="boolean">false</attr>
+    <attr name="autodescription_youcango" type="int">4</attr>
+    <attr name="autodescription_description" type="int">3</attr>
+    <attr name="autodescription_youcansee" type="int">2</attr>
+    <clearscreenonroomenter />
+    <autodescription_description_newline />
+    <autodescription_youcansee_newline />
+    <start type="script"><![CDATA[
+      msg ("<b>First-time players are advised to type \"HELP\". For those who would like to view more information, type \"CREDITS\", \"DISCLAIMER\".</b>")
+    ]]></start>
+    <roomenter type="script">
+      if (HasAttribute(player, "followers")) {
+        foreach (o, player.followers) {
+          if (HasAttribute(o, "followphrases")) {
+            msg (StringListItem(o.followphrases, GetRandomInt(0, ListCount(o.followphrases) - 1)))
+          }
+          else {
+            msg (CapFirst(GetDisplayName(o)) + " is following you.")
+          }
+          o.parent = player.parent
+        }
+      }
+    </roomenter>
+  </game>
+  <verb name="eat">
+    <pattern>eat #object#</pattern>
+    <property>eat</property>
+    <defaultexpression><![CDATA["Knowing it is probably hazardrous to your health, you take a bite out of it anyway. <br>Tastes just like a "+object.name+" should. Meanwhile, God's servant appears out of nowhere and mends the object you just ate."]]></defaultexpression>
+  </verb>
+  <object name="room">
+    <inherit name="editor_room" />
+    <isroom />
+    <alias>the Important Room</alias>
+    <usedefaultprefix type="boolean">false</usedefaultprefix>
+    <description><![CDATA[This is the Important Room*; you use it when you want to do things that are probably significant to your life.<br/>Today you came in here to save your own reputation, in other words, write a second letter to Charles V about your discoveries at Mexico in hopes that your illegal actions will be overlooked, which you consider as a matter of great importance.<br/>In fact, this is so important that you could have never possibly chosen a better place to do it than here.<br/><br/><br/>(*The existance of this room is not proven and is created merely for the purposes of entertainment.)]]></description>
+    <objectslistprefix>There is</objectslistprefix>
+    <object name="player">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <inherit name="male" />
+      <attr name="pov_look"><![CDATA[You are Hernán Cortés de Monroy y Pizarro Altamirano, a Spanish Conquistador. Your very long name makes you seem very important and intimidating indeed. <br/>With a large, greying, important-looking beard, trimmed into a perfect clam shape, arched eyebrows, and a nose that points down, you consider yourself quite good-looking for your age.<br/>]]></attr>
+      <alias>cortes</alias>
+      <hug>You wrap your arms around yourself for a few moments. Meanwhile, I, the important narrator, will express enourmous pity for you.</hug>
+    </object>
+    <object name="ink bottle">
+      <inherit name="editor_object" />
+      <feature_usegive />
+      <look>This ink bottle is designed to hold ink. The ink will go into your quill to write words with. So without this bottle, you will never be able to write anything. This makes it a very important item qualified to sit in this Important Room.</look>
+    </object>
+    <object name="roll of parchment">
+      <inherit name="editor_object" />
+      <look>This is not just any roll of parchment. This particular one is, in fact, prepared for you to write a very important letter to Charles V. So this roll of parchment too is of great importance. You must treat it with respect.</look>
+    </object>
+    <object name="quill">
+      <inherit name="editor_object" />
+      <feature_usegive />
+      <inked type="boolean">false</inked>
+      <look>A simple feather quill. You use this to write things, whether it be for yourself, for another person, or for no reason in particular. The tip is sharp enough to cause someone slight injury, but of course that is not its intended purpose.</look>
+      <write type="script">
+        if (quill.inked = false) {
+          msg ("You start scratching out words on the parchment, but alas, nothing appears.")
+        }
+        else {
+          ClearScreen
+          msg ("You start on your letter. You remember the day you arrived....")
+          wait {
+            MoveObject (player, ship)
+          }
+        }
+      </write>
+      <use type="script">
+        if (quill.inked = false) {
+          msg ("You start scratching out words on the parchment, but alas, nothing appears.")
+        }
+        else {
+          ClearScreen
+          msg ("You start on your letter. You remember the day you arrived....")
+          wait {
+            MoveObject (player, ship)
+          }
+        }
+      </use>
+      <useon type="scriptdictionary">
+        <item key="ink bottle">
+          msg ("You slowly dip the quill into the ink bottle, then draw it out with great caution.")
+          set (quill, "inked", true)
+        </item>
+      </useon>
+      <selfuseon type="scriptdictionary">
+        <item key="ink bottle">
+          msg ("You slowly dip the quill into the ink bottle, then draw it out with great caution.")
+          set (quill, "inked", true)
+        </item>
+        <item key="roll of parchment">
+          if (quill.inked = false) {
+            msg ("You start scratching out words on the parchment, but alas, nothing appears.")
+          }
+          else {
+            ClearScreen
+            msg ("You start on your letter. You remember the day you arrived....")
+            wait {
+              MoveObject (player, ship)
+            }
+          }
+        </item>
+      </selfuseon>
+    </object>
+  </object>
+  <verb>
+    <property>write</property>
+    <pattern>write with</pattern>
+    <defaultexpression>"You can't write with" + object.article + "."</defaultexpression>
+    <multiobjectdefault>That action doesn't seem important enough at the moment.</multiobjectdefault>
+  </verb>
+  <object name="coast of Mexico">
+    <inherit name="editor_room" />
+    <descprefix>You are in the</descprefix>
+    <usedefaultprefix type="boolean">false</usedefaultprefix>
+    <description><![CDATA[So, you are finally here. <br/>Originally, the governer of Cuba, Diego Velázquez de Cuéllar, commanded you to round up the stranded Spaniads on the mainland of Yucatán. But you were ambitious and had other plans.<br/>It was tricky to persuade your men to come with you, but you managed to do so by taking advantage in the vagueness in one of the orders you recieved. <br/><br/>{once:Now, since you got this far, why not ensure your men won't sail away? The best answer to this is, of couse, to destroy the ships; your important mind is never wrong.}<br>]]></description>
+    <firstenter type="script">
+      player.followers = NewObjectList()
+      list add (player.followers, dog)
+      dog.followphrases = NewStringList()
+      list add (dog.followphrases, "The dog prances after you.")
+      list add (dog.followphrases, "Sniffing around curiously, the dog follows you.")
+      list add (dog.followphrases, "The dog wags its tail around like a propeller, walking closely behind you.")
+    </firstenter>
+    <enter type="script">
+    </enter>
+    <exit alias="in" to="ship">
+      <inherit name="indirection" />
+    </exit>
+    <object name="dog">
+      <inherit name="editor_object" />
+      <look><![CDATA[Messy black fur with white spots. Probably a stray. It wags its tail and stares up at you hopefully, looking like the most unimportant thing in the world. <br/><br/>]]></look>
+      <feature_usegive />
+      <inroomdescription>The dog {random:stretches and yawns:sits down and scratches the back of its ear:stares off into space, looking bored:whines at a passerby:tries to squash a bug with its paw:sniffs your shoes}.</inroomdescription>
+      <usestandardverblist />
+      <give type="scriptdictionary" />
+    </object>
+    <object name="ship">
+      <description type="string"></description>
+      <isroom type="boolean">false</isroom>
+      <isDestroyed type="boolean">false</isDestroyed>
+      <destroy type="script"><![CDATA[
+        msg ("\"B-but sir, there will be no way back...\" one of the men mutters, shocked. You dismiss it and again give out a curt, strongly-worded order to destroy the ships.<br/>Luckily, this just is a recollection, so the process is over in a second.")
+        set (ship, "isDestroyed", true)
+        RemoveObject (ship)
+        msg ("Congratulations! You are on your way to fame and glory. Now, why not visit the city?")
+        UnlockExit (exit to city)
+        IncreaseScore (10)
+      ]]></destroy>
+      <exit alias="out" to="coast of Mexico">
+        <inherit name="outdirection" />
+      </exit>
+    </object>
+    <exit name="exit to city" alias="east" to="city of Temixititan">
+      <inherit name="eastdirection" />
+      <locked />
+      <lockmessage>Hold up; you are forgetting something. You haven't dealt with the ships yet. Destroy them first so your men cannot bail.</lockmessage>
+      <scenery type="boolean">false</scenery>
+      <attr name="grid_length" type="int">2</attr>
+    </exit>
+    <object name="brigantines">
+      <inherit name="editor_object" />
+      <look>Your hard-working men made four of these ships in case there is the need to escape. They can carry 300 men and the horses in total.</look>
+      <inroomdescription>Four brigantines lie ready for use.</inroomdescription>
+      <visible type="boolean">false</visible>
+      <feature_usegive />
+      <use type="script">
+        if (game.score = 30) {
+          IncreaseScore (5)
+        }
+        else {
+          msg ("You have not explored everything, and there is much work still to be done.")
+        }
+      </use>
+    </object>
+  </object>
+  <verb>
+    <pattern>hug #object#</pattern>
+    <property>hug</property>
+    <defaulttext>I am sure you are sad and lonely inside, but you ought to maintain your dignity.</defaulttext>
+    <multiobjectdefault>That is both an absurd and unimportant thing to do.</multiobjectdefault>
+  </verb>
+  <verb>
+    <pattern>destroy #object#</pattern>
+    <defaulttext>While mass destruction is extremely satisfying, especially for a man facing many responsibilities, it is best to leave it be.</defaulttext>
+    <property>destroy</property>
+  </verb>
+  <command name="credits">
+    <pattern type="string">credits</pattern>
+    <script><![CDATA[
+      msg ("Thanks to my literature class teacher, and my friends. <br/>All information in this game is based on <i>The Norton Anthology American Literature, Beginnings to 1820, Ninth Edition, From Second Letter to the Spanish Crown</i>")
+    ]]></script>
+  </command>
+  <command name="disclaimer">
+    <pattern type="string">disclaimer</pattern>
+    <script>
+      msg ("Parts of the story are based on the author's interpretation of the actual text. Some are for entertainment purposes. ")
+    </script>
+  </command>
+  <object name="city of Temixititan">
+    <inherit name="editor_room" />
+    <attr name="grid_label">Temixititan</attr>
+    <attr name="grid_fill">Tan</attr>
+    <usedefaultprefix type="boolean">false</usedefaultprefix>
+    <prefix>the</prefix>
+    <description><![CDATA[The first thing you notice are the streets. The main streets are very wide and straight; some of them and the smaller ones are half on land, half on canals where the people paddle their canoes. All of the streets have openings to let water pass from one canal to another. Over these canals lie bridges, made of long and wide beams joined together so firmly that you estimate 10 horsemen could ride on them without any trouble.<br/><br/>You are also quick to notice, due to your experience as a Conquistador, that the city is designed skillfully so that once the bridges are removed, those on the mainland would be trapped and starved to death. You start to get slightly anxious. What if the inhabitants betray you and your men? Maybe destroying the ships so quickly wasn't such a good idea. Oops.<br/><br/>{once:But not to worry, the men will do all the work for you. Just "tell to..." build the brigantines and they will carry out the order!}<br/>]]></description>
+    <exit alias="west" to="coast of Mexico">
+      <inherit name="westdirection" />
+    </exit>
+    <exit name="build brigantine" alias="east" to="large square">
+      <inherit name="eastdirection" />
+      <locked />
+      <lockmessage>Hold up; you're forgetting something again! You don't want to get trapped here, do you? Then go command your men to build brigantines first!</lockmessage>
+    </exit>
+    <object name="men">
+      <inherit name="editor_object" />
+      <look>The men that were assigned to serve you. They look slightly resentful of the current situation.</look>
+      <inroomdescription>A handful of men come with you.</inroomdescription>
+      <usedefaultprefix type="boolean">false</usedefaultprefix>
+      <tellto type="scriptdictionary">
+        <item key="build make ship brigantine brigantines ships"><![CDATA[
+          if (ship.isDestroyed = true) {
+            msg ("\"Yes, sir.\" The man you talked to responds obediently. The moment your back is turned, you hear an exasperated sigh from one of the men. <br/>\"But he just made us get rid of everything!\"<br/><br/>In a second, the men finish their jobs. The brigantines are ready back at the coast.")
+            msg ("Now, that one more problem out of the way - time to head on.")
+            UnlockExit (build brigantine)
+            IncreaseScore (10)
+            MakeObjectVisible (brigantines)
+          }
+          else {
+            msg ("The men look at you blankly. <br/>\"Sir? We still have our ships, there is no need to build more.\"")
+          }
+        ]]></item>
+      </tellto>
+    </object>
+  </object>
+  <object name="large square">
+    <inherit name="editor_room" />
+    <description>This is one out of the many city squares, and also probably the largest. You estimate its size to be twice of that of Salamanca's. One of the inhabitants tells you that about 60 thousand people come by each day to buy and sell, and every kind of merchendise produced in these lands can be found here. You decide to look around.</description>
+    <exit alias="west" to="city of Temixititan">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="north" to="agricultural">
+      <inherit name="northdirection" />
+    </exit>
+    <exit alias="east" to="game street">
+      <inherit name="eastdirection" />
+    </exit>
+    <exit alias="south" to="herbalists">
+      <inherit name="southdirection" />
+    </exit>
+    <exit alias="northeast" to="provisions">
+      <inherit name="northeastdirection" />
+    </exit>
+    <exit alias="southeast" to="main temple">
+      <inherit name="southeastdirection" />
+    </exit>
+  </object>
+  <object name="provisions">
+    <inherit name="editor_room" />
+    <description><![CDATA[[enter location identifier]<br/>Many shops line the street, places selling ornaments of gold, silver, lead, brass, copper, tin, stones, shells, bones, and shells. Right next to that you find a place selling lime, stone (both hewn and unhewn), adobe bricks, tiles, various kinds of wood. ]]></description>
+    <exit alias="southwest" to="large square">
+      <inherit name="southwestdirection" />
+    </exit>
+  </object>
+  <object name="herbalists">
+    <inherit name="editor_room" />
+    <description><![CDATA[[location identifier]<br/>Here they sell medicinal herbs and roots found in this land. You think these shops are similar to apothecaries, where they sell ready-made medicines as well as liquid ointments and plasters. <br/>There are also places where one can have their hair washed and cut like a barbers'.<br/>One shop sells vegtables and fruit, with such diversity that you can only name a few: onions, leeks, garlic, common cress and watercress, borage, sorrel, teasels, artichokes, and for the fruit you can only recognise cherry and plums.<br/><br/>You see some men (not yours) offering service to carry heavy loads for people, too.<br/><br/>Glancing further along the street you find there are even more supplies being sold: plenty of firewood and charcoal, earthenware braziers, mats, and mattresses. ]]></description>
+    <exit alias="north" to="large square">
+      <inherit name="northdirection" />
+    </exit>
+  </object>
+  <object name="game street">
+    <inherit name="editor_room" />
+    <description><![CDATA[[location indentifier]<br/>This street sells game and bird of every specie known to be in this land.<br/>Chickens, patridges, quails, wild ducks, flycatchers, widgeons, turtledoves, pigeons, cane birds, parrots, eagles, eagle owls, falcons, sparrow hawks and kestrels lie on the ground. The skins, feathers, heads and claws of birds of prey are also being sold together. You can also see rabbits and hares, stags, even gelded dogs, all bred for eating.<br/><br/>Some shops sell food and drink. They sell chicken and fish pies, fresh or salted, raw and cooked fish, and hen and goose eggs are sold in great numbers.]]></description>
+    <exit alias="west" to="large square">
+      <inherit name="westdirection" />
+    </exit>
+  </object>
+  <object name="agricultural">
+    <inherit name="editor_room" />
+    <description><![CDATA[This street seems to be mainly focused on agricultural products. <br/>Honey, wax, syrup from corn canes (which tastes as good as the syrup from sugar canes, you tried some when they offered it for free.) and syrup from maguey. You find that the maguey produces the best syrup that you have tasted so far, the people here also use the plant to make sugar and wine.<br/><br/>There are spun cotton, paint of all hues (the colours are good as ones found in Spain), and deerskins. <br/>As you walk on a little way, you come across a shop that sells earthenware of all shapes and sizes, made from good clay: pitchers, jugs, pots, tiles, and other sorts of vessel, most of them properly glazed and painted.]]></description>
+    <exit alias="south" to="large square">
+      <inherit name="southdirection" />
+    </exit>
+  </object>
+  <turnscript name="meansure police">
+    <enabled />
+    <script>
+      foreach (o, AllObjects()) {
+        if (HasScript(o, "takeaturn")) {
+          if (GetBoolean(o, "paused")) {
+            o.paused = false
+          }
+          else {
+            do (o, "takeaturn")
+          }
+        }
+      }
+    </script>
+  </turnscript>
+  <object name="scale popo">
+    <inherit name="editor_object" />
+    <feature_startscript />
+    <look type="string"></look>
+    <inroomdescription>{here player:{random: : : : : :You hear a sudden smash, and turn around just in time to see a Very Important-Looking man breaking a faulty scale.}}</inroomdescription>
+    <alias>Scale Po-po</alias>
+    <attr name="_initialise_" type="script"><![CDATA[
+      this.route = NewObjectList()
+      list add (this.route, provisions)
+      list add (this.route, provisions)
+      list add (this.route, herbalists)
+      list add (this.route, herbalists)
+      list add (this.route, game street)
+      list add (this.route, game street)
+      list add (this.route, agricultural)
+      list add (this.route, agricultural)
+      this.patrolstate = -1
+      this.takeaturn => {
+        oldroom = this.parent
+        this.patrolstate = (this.patrolstate + 1) % ListCount(this.route)
+        this.parent = ObjectListItem(this.route, this.patrolstate)
+        if (not oldroom = this.parent) {
+          PrintIfHere (oldroom, "The Very Important-Looking person walks away, looking around.")
+          PrintIfHere (this.parent, "A Very Important-Looking person walks in and checks the scales being used by each shop.")
+        }
+      }
+    ]]></attr>
+    <speak type="script">
+      msg ("You have a breif chat with the man - he explains his job is to patrol the place and break scales which are faulty. Apparantly some sellers cheat to sell less and get the same amount of money for it.")
+      this.paused = true
+    </speak>
+  </object>
+  <object name="main temple">
+    <inherit name="editor_room" />
+    <description><![CDATA[This is probably the only thing in the whole city that looks more important than you, and that's saying something. It looks absolutely stunning. <br/>***********<br/>Momentarily you snap out of your recollection to try to describe in your letter how magnificent the temple looked, but after a short while you realise that you can save time and energy with the lazy sentence "cannot be described in the human tongue".<br/>***********<br/><br/>The temple is surrounded by a high wall, and around this wall there are quarters with large rooms and corridors that the priests live in. More than forty towers scrape the sky, which, you learn later, are burials of chiefs, and the most important-looking tower (though not as important-looking as yourself) is the cathederal of Seville. Even you are impressed with the structure of it; it must be the best place for the idols resting in there.<br/><br/>But you are disgusted to see that the chapels are filled with blood and sacrifices.<br/><br/>You have an urge to take them down. And that is exactly what you will do.]]></description>
+    <exit alias="northwest" to="large square">
+      <inherit name="northwestdirection" />
+    </exit>
+    <object name="The Most Important Idol">
+      <inherit name="editor_object" />
+      <look><![CDATA[This is inacceptable. There can be only ond God, Lord of all things, the one you and everyone from your country believes in, and no other. <br/><br/>You shed a tear thinking about the beauty of your one and only Lord, but rudely inturrupted by the stray dog chewing your shoe. You give it a distainful look and order one of your men to chase it away. He immediately approaches the dog, but to your disappointment, pets it kindly, and gives it a treat.<br/><br/>{once:You must destroy this idol.}]]></look>
+      <inroomdescription>A large idol sits here. It looks the most popular.</inroomdescription>
+      <destroy type="script"><![CDATA[
+        msg ("With the help of your men, you take it and throw it down the steps. The crashing sounds echo around, drawing attention.<br/>An inhabitant cries out desparately and attempts to run towards the idol, hands outstretched, but is held back by someone else, who also looks on in dismay.")
+        RemoveObject (The Most Important Idol)
+        wait {
+          msg ("*****************<br/><br/>After you dispose of the idol, you explain to the natives, through a translator, about how there can be only one God and other religeous talk that you consider significant.<br/><br/>They stilll begged you to stop, for they feared the rest will rise up against you when they learn of your deeds, and how their gods would take away their worldly goods in anger, then they will finally starve to death.<br/>You are not sorry to say you did not heed these warnings, for these people are clearly on the inferior and unimportant end of human beings, and you do not fear them.")
+        }
+        IncreaseScore (5)
+      ]]></destroy>
+    </object>
+    <object name="chapels">
+      <inherit name="editor_object" />
+      <look>Filled with blood and sacrifices. Disgusting.</look>
+      <destroy type="script"><![CDATA[
+        msg ("You clean everything out and replace the idols inside with images of the Lady.<br/>A group of natives watch, frozen with horror.")
+        IncreaseScore (5)
+        RemoveObject (chapels)
+      ]]></destroy>
+    </object>
+  </object>
+  <turnscript name="score detector">
+    <enabled />
+    <script><![CDATA[
+      if (game.score = 35) {
+        PrintCentered ("<br/>Well, it was a long stay, but your work here is done.<br/>You saw a lot of what there is to see, and successfully \"fixed\" the once-filthy religion.<br/>Still, you admit it is incredible what the supposedly inadvanced inhabitants of Mexico has achieved.<br/>*********************************<br/>You end the final sentence of the letter with a dot, stand up, and exit the room to send the letter.<br/><br/>A few minutes later, you are back in your Important Room to continue with your important thoughts.<br/><br/>You smirk to yourself. It was a clever trick you pulled in that letter. Everything was just a distraction. Just some excessive information to drive the reader's attention away from the fact that what you did was all technically illegal. Charles V won't be able to blame you for anything, not when he finds out about all the goods lying in Mexico untouched. He will praise you and the rest of the world will treat you as a hero. The hero who hit the jackpot.<br/><br/>*********************************<br/><b>THE END</b><br/>Thanks for playing this short game!")
+        finish
+      }
+      else if (game.score = 30) {
+        msg ("<i>You should be heading home soon. You have done enough for one trip. Return to the coast, board the ships, and leave.</i>")
+      }
+    ]]></script>
+  </turnscript>
+  <type name="edible">
+    <eathealth type="int">0</eathealth>
+    <eat type="script">
+      if (HasString(this, "eatmsg")) {
+        msg (this.eatmsg)
+      }
+      else {
+        msg (DynamicTemplate("Eaten", this))
+      }
+      if (HasInt(game.pov, "health")) {
+        game.pov.health = game.pov.health + this.eathealth
+      }
+      destroy (this.name)
+    </eat>
+  </type>
+  <function name="PrintIfHere" parameters="room, s">
+    if (game.pov.parent = room) {
+      msg (s)
+    }
+  </function>
+  <walkthrough name="remember">
+    <steps type="simplestringlist">
+      use quill on ink bottle
+      write with quill
+    </steps>
+  </walkthrough>
+</asl>
